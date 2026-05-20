@@ -40,9 +40,17 @@ This is the MCP (Multimodal Chatbot Protocol) extension integrated into the Pi c
 
 ## Installation & Usage
 
-1. Place `index.js` in your extension directory: `/Users/simonlaureti/.pi/agent/extensions/mcp`
+1. Option 1: Place `index.js` in your extension directory:
+- Install into `~/.pi/agent/extensions/mcp`
+- The system will automatically load and register the module
+
 2. Create `.mcp.json` if needed for configuration (auto-generated)
 3. The system automatically loads and registers tools during Pi session start
+
+Option 2: Clone repository instead:
+```bash
+git clone https://github.com/maraxor27/mcp.git ~/.pi/agent/extensions/mcp
+The extension files are pre-configured and ready to use.
 
 ## Configuration Files
 
