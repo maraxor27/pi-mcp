@@ -11,7 +11,7 @@ import { readFile } from "node:fs/promises";
 import process from "process";
 
 async function loadMCP() {
-  const user_mcp = "~/.pi/.mcp.json";
+  const user_mcp = "~/.pi/agent/.mcp.json";
   const workdir_mcp = `${process.cwd()}/.mcp.json`;
   
   const mcps = {};
@@ -35,7 +35,7 @@ async function loadMCP() {
 
 function convertMCPType(t) {
   if (t == undefined) {
-    return Type.Void();
+    return Type.Object({});
   }
 
   const options = {};
