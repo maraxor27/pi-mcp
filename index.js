@@ -119,8 +119,17 @@ export default async function (pi) {
 
   // Register MCP tools 
   const registered = [];
+  const instructions = new Map();
   for (const client of clients) {
-    const info = { server: client.getServerVersion().name, tools: []}
+    const server_name = client.getServerVersion().name
+    const info = { server: server_name, tools: []}
+    
+    // Store mcp server instructions for system prompt building
+    const instr = client.getInstructions();
+    if (instr != undefined) {
+      instructions.set(server_name, instr);
+    }
+
     const tools = await client.listTools();
     for (const tool of tools.tools) {
       info.tools.push(tool.name);
@@ -143,9 +152,36 @@ export default async function (pi) {
         console.error(e);
       }
     }
-
+    
     registered.push(info);
   }
+  
+  pi.on("before_agent_start", async (event) => {
+    if (instructions.size === 0) return undefined;
+
+    const sections = [];
+    for (const [server_name, server_instructions] of instructions) {
+      const trimmed_instructions = server_instructions.trim();
+      
+      // Skip empty instructions
+      if (trimmed_instructions.length === 0) continue;
+
+      sections.push(`### ${server_name}\n${trimmed_instructions}`)
+    }
+
+    if (sections.length === 0) return undefined;
+
+    return {
+      systemPrompt:
+        event.systemPrompt +
+        `
+
+--- MCP INSTRUCTIONS ---
+${sections.join("\n\n")}
+--- END MCP INSTRUCTIONS ---
+        `
+    };
+  });
 
   // Notify when extension loads
 	pi.on("session_start", async (_event, ctx) => {
